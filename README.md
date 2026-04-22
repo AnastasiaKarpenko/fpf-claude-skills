@@ -1,10 +1,11 @@
-# fpf-design — Claude Code Skill
+# fpf-claude-skills
 
-A Claude Code skill that helps you design solutions and validate architecture decisions using **FPF (First Principles Framework)** — a set of universal distinctions that keeps your thinking precise and your models category-error-free.
+A collection of Claude Code skills that apply **FPF (First Principles Framework)** to software design and code review.
 
-Two modes:
-- **`analyze`** — describe a problem, get a structured FPF-based design
-- **`validate`** — describe an existing design, get a conformance report with violations and fixes
+| Skill | What it does |
+|-------|-------------|
+| `/fpf-design` | Analyze a problem or validate a design description for FPF violations |
+| `/fpf-review` | Review code for design violations — complements CodeRabbit |
 
 Based on [ailev/FPF](https://github.com/ailev/FPF).
 
@@ -39,13 +40,15 @@ Core ideas in plain language:
 
 **Personal (available in all projects):**
 ```bash
-git clone https://github.com/your-username/fpf-design-skill
-cp -r fpf-design-skill/.claude/skills/fpf-design ~/.claude/skills/fpf-design
+git clone https://github.com/anastasiak2512/fpf-claude-skills
+cp -r fpf-claude-skills/.claude/skills/fpf-design ~/.claude/skills/fpf-design
+cp -r fpf-claude-skills/.claude/skills/fpf-review ~/.claude/skills/fpf-review
 ```
 
 **Project-specific:**
 ```bash
-cp -r fpf-design-skill/.claude/skills/fpf-design your-project/.claude/skills/fpf-design
+cp -r fpf-claude-skills/.claude/skills/fpf-design your-project/.claude/skills/fpf-design
+cp -r fpf-claude-skills/.claude/skills/fpf-review your-project/.claude/skills/fpf-review
 ```
 
 Restart Claude Code after installing.
@@ -112,12 +115,36 @@ Rewrite as: Scheduler reads config → Scheduler triggers Pipeline → Pipeline 
 
 ---
 
+---
+
+## /fpf-review — code review
+
+Reviews code for design violations that CodeRabbit doesn't catch: responsibility boundary leaks, passive objects that make decisions, design-time and runtime state mixed in one class.
+
+**Does not check:** syntax, style, performance, security, test coverage — CodeRabbit handles those.
+
+```
+/fpf-review src/scheduler/
+
+/fpf-review                   # reviews current git diff
+```
+
+Returns a PR-style report:
+- ✅ what is well-separated
+- ⚠️ violations with plain-language explanation and concrete fix suggestion
+
+---
+
 ## File structure
 
 ```
-.claude/skills/fpf-design/
-├── SKILL.md       — skill instructions and methodology
-└── reference.md   — distilled FPF principles (self-contained, no external dependency)
+.claude/skills/
+├── fpf-design/
+│   ├── SKILL.md       — skill instructions and methodology
+│   └── reference.md   — distilled FPF principles (self-contained)
+└── fpf-review/
+    ├── SKILL.md       — review instructions and violation patterns
+    └── reference.md   — same FPF reference (shared)
 ```
 
 ---
