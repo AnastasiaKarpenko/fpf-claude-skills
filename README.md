@@ -9,7 +9,7 @@ A collection of Claude Code skills that apply **FPF (First Principles Framework)
 
 Based on [ailev/FPF](https://github.com/ailev/FPF).
 
-**Lightweight** — uses a ~4K-token distilled reference, not the full FPF spec (1.2M tokens). Best used on a single file or `git diff`, not entire directories.
+**Lightweight** — uses a ~4.5K-token distilled reference, not the full FPF spec (1.2M tokens). Best used on a single file or `git diff`, not entire directories.
 
 ---
 
