@@ -1,15 +1,15 @@
 # fpf-claude-skills
 
-A collection of Claude Code skills that apply **FPF (First Principles Framework)** to software design and code review.
+Two Claude Code skills for catching design problems — before you write code and after.
 
-| Skill | What it does |
-|-------|-------------|
-| `/fpf-design` | Analyze a problem or validate a design description for FPF violations |
-| `/fpf-review` | Review code for design violations — complements CodeRabbit |
+| Skill | When to use | What you get |
+|-------|-------------|-------------|
+| `/fpf-design` | You have a problem or a design idea and want to think it through before coding | Structured breakdown of the design: what acts, what's passive, where boundaries are, what's a guess vs what's decided |
+| `/fpf-review` | You have a diff or a file and want to check the structure of the implementation | PR-style report: what's clean, what's tangled, concrete fix suggestions |
 
-Based on [ailev/FPF](https://github.com/ailev/FPF).
+**The short version:** `/fpf-design` is for thinking. `/fpf-review` is for reviewing.
 
-**Lightweight** — uses a ~4.5K-token distilled reference, not the full FPF spec (1.2M tokens). Best used on a single file or `git diff`, not entire directories.
+Based on [ailev/FPF](https://github.com/ailev/FPF). Lightweight — ~4.5K tokens of distilled principles, not the full 1.2M-token spec.
 
 ---
 
@@ -31,10 +31,9 @@ FPF (First Principles Framework) is a framework by [Anatoly Levenchuk](https://g
 
 Core ideas in plain language:
 
-- **Systems act. Documents don't.** A service can execute logic. A config file, a spec, a schema — these are knowledge artifacts that describe what to do. They can't decide anything on their own.
-- **Recipe ≠ cooking.** A MethodDescription (SOP, algorithm, workflow) is design-time knowledge. Work is the actual run-time execution with a timestamp and resource cost. Having the recipe doesn't mean dinner was made.
-- **Role ≠ structure.** A role is a contextual mask a system wears (e.g. `PaymentService#TransformerRole`). It's not a component in a hierarchy and not a type.
-- **Local meaning.** Terms mean different things in different contexts. FPF makes context boundaries explicit so there's no silent semantic drift between teams or services.
+- **Services act. Documents don't.** A service can execute logic. A config file, a spec, a schema — these describe what to do, they can't do anything on their own.
+- **Having the recipe doesn't mean dinner was made.** A spec, a workflow description, a plan — these are design-time artifacts. Actual work has a timestamp, a cost, and an output. Confusing the two is one of the most common sources of "we thought it was done" bugs.
+- **Terms mean different things in different contexts.** FPF makes context boundaries explicit so there's no silent semantic drift between teams or modules.
 
 ---
 
@@ -80,19 +79,18 @@ You can write short or long descriptions — the more context you give, the more
 
 ### analyze mode
 
-Returns:
-- **System-of-Interest** — what is being designed, its type and boundary
-- **Bounded Context** — local vocabulary, invariants, cross-context bridges
-- **Roles** — who acts and in what capacity (`Holder#Role:Context`)
-- **Method–Work** — recipes (design-time) vs outputs with criteria (run-time)
-- **FPF distinctions applied** — what was clarified or corrected
-- **Hypothesis & validation** — what's being proposed and how to verify it
+Returns a structured breakdown of your problem:
+- **What is being built** — the thing you're designing and where its boundary is
+- **Local vocabulary** — what terms mean in this context, and how they map to adjacent systems
+- **Who does what** — which components act, which just hold data, who coordinates
+- **Design vs runtime** — what's a recipe/plan vs what's an actual execution with output
+- **What's unclear** — assumptions and open questions surfaced explicitly
 
 ### validate mode
 
 Returns a **Conformance Report**:
 - ✅ what is correctly modeled
-- ⚠️ violations with the FPF rule broken and a suggested fix
+- ⚠️ issues with a plain-language explanation of what's wrong and a suggested fix
 - recommendation before committing the design
 
 ---
@@ -123,8 +121,6 @@ Output:
 ### Recommendation
 Rewrite as: Scheduler reads config → Scheduler triggers Pipeline → Pipeline run is recorded with timestamp and outcome.
 ```
-
----
 
 ---
 
