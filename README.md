@@ -130,19 +130,40 @@ Rewrite as: Scheduler reads config → Scheduler triggers Pipeline → Pipeline 
 
 ## /fpf-review — code review
 
-Reviews code for design violations that CodeRabbit doesn't catch: responsibility boundary leaks, passive objects that make decisions, design-time and runtime state mixed in one class.
+Code review has a dirty secret: most automated tools (linters, static analyzers, CodeRabbit) are great at catching *how* the code is written, but none of them ask *whether the design makes sense*. That's the gap this skill fills.
 
-**Does not check:** syntax, style, performance, security, test coverage — CodeRabbit handles those.
+It looks at the structure of your changes and asks: are responsibilities placed where they belong? Do module boundaries hold? Is business logic where it should be — or scattered across layers that shouldn't know about it?
+
+**What it catches:**
+
+- A config object or DTO that contains decision logic — data that's making up its own mind
+- A class that's simultaneously a recipe, an executor, and a result log — three jobs, one place
+- A service reaching into another module's internals instead of going through its interface
+- The same business rule copy-pasted in three places — waiting to drift apart
+- Domain logic sitting in a controller or a mapper where it doesn't belong
+- One service doing both orchestration and computation — coordination and business rules tangled together
+- A domain object crossing a module boundary without being translated — leaking your internal model into someone else's context
+- A TODO or disabled test presented as working functionality
+
+Each finding comes with a plain-language explanation of what's wrong, why it matters, and a concrete suggestion for how to fix it.
+
+**What it doesn't check** — and doesn't try to: syntax, style, naming, performance, security, test coverage. CodeRabbit handles those. And it can't tell you whether your business logic is *correct* — that requires knowing the domain and reading the ticket. That part stays with the human reviewer.
+
+**What human reviewers still own:**
+- Does this solution actually solve the stated problem?
+- Are the business rules themselves right — edge cases, domain invariants, correctness?
+- Does this change introduce risks in areas the diff doesn't show (downstream effects, data migrations)?
+- Is the overall approach the right one, or is there a simpler design?
 
 ```
-/fpf-review src/scheduler/
-
 /fpf-review                   # reviews current git diff
+/fpf-review src/scheduler/    # reviews a specific file or directory
 ```
 
 Returns a PR-style report:
-- ✅ what is well-separated
-- ⚠️ violations with plain-language explanation and concrete fix suggestion
+- ✅ what is well-separated and correctly structured
+- ⚠️ issues with plain-language explanation and concrete fix suggestion
+- what was not checked (so you know what's still on you)
 
 ---
 
