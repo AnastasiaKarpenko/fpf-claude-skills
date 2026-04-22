@@ -116,31 +116,31 @@ Verify: each context can be deployed independently without shared schema changes
 
 **Checklist — check each item:**
 
-### Holon & Boundary (A.1)
-- [ ] Every acting entity is typed as `U.System` (not generic Holon or Episteme)
+### Actors and boundaries
+- [ ] Every acting entity can actually act on its own (not a document, config, or spec)
 - [ ] Boundaries are declared — what is inside/outside?
-- [ ] Groups expected to act are modeled as Collective Systems (not sets)
+- [ ] Groups expected to act are modeled as units with their own boundary and roles (not just a list)
 
-### Bounded Context (A.1.1)
-- [ ] Context is specific (not a domain family label like "Healthcare")
-- [ ] Cross-context term alignment uses explicit Bridges
-- [ ] No context hierarchy — contexts are flat
-- [ ] Each Role is defined inside a context
+### Semantic scope
+- [ ] Terms are defined locally — the same word in two different parts of the system may mean different things
+- [ ] Cross-boundary term alignment is explicit, not assumed
+- [ ] Each Role is defined inside a specific scope, not globally
+- [ ] Scopes are independent — one module/service does not silently inherit the rules or definitions of another just because they share a namespace or package
+- [ ] A file or document is not the same as what it represents — a schema file is not the data contract, a config file is not the logic, a test file is not evidence that tests pass
 
-### Strict Distinctions (A.7)
-- [ ] Role (mask) ≠ Method (behavior)
-- [ ] MethodDescription (recipe) ≠ evidence that Work was done
-- [ ] Episteme does not "act", "decide", or "execute"
-- [ ] Carrier (file/document) ≠ Episteme (knowledge content)
-- [ ] "Process" is resolved to Method / WorkPlan / Work
+### Clarity of concepts
+- [ ] Role (what position something holds) ≠ Method (what it does in that position)
+- [ ] A recipe/spec/SOP is not evidence that the work was actually done
+- [ ] Documents, configs, schemas cannot act, decide, or execute — only systems can
+- [ ] "Process" is ambiguous — resolve to: recipe (how to do it), schedule (when to do it), or execution (what happened)
 
-### Role–Method–Work (A.15)
-- [ ] Each Work traces back to: Role → RoleAssignment → MethodDescription
-- [ ] Design-time artifacts (Role, Method, MethodDescription) are not confused with run-time (Work)
-- [ ] No "paper compliance" — spec existence ≠ work done
+### Design vs runtime
+- [ ] Each execution traces back to: who did it → in what role → following which recipe
+- [ ] Design-time artifacts (roles, recipes, plans) are not confused with run-time events (what actually happened)
+- [ ] No "paper compliance" — having a spec does not mean the work was done
 
-### Reasoning (B.5)
-- [ ] New claims name the problem they solve (not solution-in-search-of-a-problem)
+### Reasoning
+- [ ] New proposals name the problem they solve (not solution in search of a problem)
 - [ ] Design decisions state how they would be validated
 
 **Software-specific checks:**
@@ -150,24 +150,28 @@ Verify: each context can be deployed independently without shared schema changes
 - [ ] "Service A calls Service B" → is the Role assignment explicit? Is the context declared?
 - [ ] API contract treated as evidence work is done → MethodDescription ≠ Work
 
+### Before reporting a violation — verify in context (mandatory)
+
+For each candidate violation found above, before including it in the report:
+1. **Read the call sites** — how is the artifact actually used by callers?
+2. **Read surrounding code** — are there adjacent log lines, guards, or comments that already resolve the apparent violation?
+3. **Check the runtime path** — does the violation actually occur at runtime, or is it dead code / an unreachable branch?
+
+Only report a violation if it holds after this check. If surrounding context resolves it, note it as compliant with an explanation. A violation that exists only when reading an artifact in isolation — but is disambiguated by its call site — is not a real violation.
+
 **Output format:**
 ```
 ## Conformance Report
 
-### ✅ What's correct
-[what is correctly modeled, in plain language]
+### ✅ Compliant
+[what is correctly modeled]
 
-### ⚠️ Issues found
-For each issue:
-- What the problem is — in plain, non-jargon language
-- Why it matters (what breaks if left as-is)
-- Concrete fix — a rewritten sentence or design change
+### ⚠️ Violations
+[plain-language description of the violation — suggested fix]
 
 ### Recommendation
-[one clear action to take before committing this design]
+[what to fix before committing this design]
 ```
-
-**Important:** Explain violations in plain language first. Use FPF terms only when they add precision, and always follow with a plain explanation in parentheses.
 
 **Software example:**
 
@@ -177,21 +181,13 @@ Output:
 ```
 ## Conformance Report
 
-### ✅ What's correct
-- Scheduler is treated as an active system that can run things ✓
+### ✅ Compliant
+- Scheduler is modeled as a System (can act) ✓
 
-### ⚠️ Issues found
-
-1. "The config decides when to run"
-   A config file is a passive document — it can't make decisions.
-   What actually decides is the Scheduler, using the config as instructions.
-   Fix: "The Scheduler reads the job config as a set of rules and decides when to trigger runs."
-
-2. "The pipeline executes itself"
-   Nothing can trigger itself — there's always an external actor causing the action.
-   Fix: split into two things — the Scheduler (which triggers) and the Pipeline (which gets triggered).
-   Rewrite: "The Scheduler triggers the Pipeline when conditions in the job config are met."
+### ⚠️ Violations
+1. "reads the config and decides" — a config file cannot decide anything, it has no agency. Fix: the Scheduler decides by following the job config as a recipe.
+2. "pipeline executes itself" — nothing can transform itself. Fix: split into Scheduler (the one acting) and Pipeline (the target being triggered).
 
 ### Recommendation
-Rewrite as: Scheduler reads job config → Scheduler triggers Pipeline → Pipeline run is recorded with timestamp and outcome.
+Rewrite as: Scheduler#SupervisorRole:PipelineContext enacts TriggerJob MethodDescription → produces Work record per scheduled run.
 ```
