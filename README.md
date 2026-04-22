@@ -167,6 +167,12 @@ Core ideas behind the checks:
 
 ---
 
+## Attribution
+
+These skills are built on top of FPF. If you use them, please cite:
+
+> Levenchuk, Anatoly. First Principles Framework (FPF). GitHub repository: https://github.com/ailev/FPF
+
 ## License
 
 MIT
