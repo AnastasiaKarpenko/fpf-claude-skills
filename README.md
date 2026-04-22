@@ -38,11 +38,20 @@ Core ideas in plain language:
 
 ## Installation
 
-**Personal (available in all projects):**
+You can install both skills or just the one you need.
+
+**Both skills, personal (available in all projects):**
 ```bash
-git clone https://github.com/anastasiak2512/fpf-claude-skills
+git clone https://github.com/AnastasiaKarpenko/fpf-claude-skills
 cp -r fpf-claude-skills/.claude/skills/fpf-design ~/.claude/skills/fpf-design
 cp -r fpf-claude-skills/.claude/skills/fpf-review ~/.claude/skills/fpf-review
+```
+
+**One skill only:**
+```bash
+git clone https://github.com/AnastasiaKarpenko/fpf-claude-skills
+cp -r fpf-claude-skills/.claude/skills/fpf-design ~/.claude/skills/fpf-design   # design only
+cp -r fpf-claude-skills/.claude/skills/fpf-review ~/.claude/skills/fpf-review   # review only
 ```
 
 **Project-specific:**
