@@ -92,6 +92,79 @@ A specification, plan, or contract cited as if it proves work was done.
 - A TODO comment used as a placeholder instead of an actual implementation
 - An interface with a no-op implementation that silently passes all calls
 
+### Pattern 6 — Business rule in the wrong layer
+Domain or business logic placed in infrastructure code (controller, repository, DTO, mapper) instead of the service or domain layer.
+
+**Signals:**
+- Validation beyond input format (e.g. "user must have active subscription") in a controller or DTO
+- Business decision (e.g. "if order status is X, do Y") inside a repository method
+- Conditional domain logic in a mapper or serializer
+
+```
+Examples:
+  fun toDto(order: Order): OrderDto {
+    if (order.status == CANCELLED && order.total > 0) refund()  ← business rule in mapper → violation
+  }
+
+  @PostMapping("/pay")
+  fun pay(...) {
+    if (user.balance < amount) throw InsufficientFundsException()  ← domain rule in controller → violation
+  }
+```
+
+### Pattern 7 — Orchestration mixed with business logic
+A single service both coordinates other services AND implements domain rules. These are different responsibilities and change for different reasons.
+
+**Signals:**
+- A service calls 3+ other services AND contains non-trivial conditional logic
+- Methods named `process()` or `execute()` that both delegate to other services and compute domain results
+- Business calculations inside a class whose main job is sequencing calls
+
+```
+Examples:
+  class OrderService {
+    fun submitOrder(order: Order) {
+      val discount = if (order.items.size > 10) 0.1 else 0.0   ← domain rule
+      paymentService.charge(order.total * (1 - discount))       ← orchestration
+      inventoryService.reserve(order.items)                     ← orchestration
+      notificationService.notify(order.userId)                  ← orchestration
+    }
+  }
+  ← discount logic should be in a domain/pricing service, not here
+```
+
+### Pattern 8 — Domain object crossing module boundary without translation
+An object from one module's domain model is passed directly into another module instead of being mapped to the receiving module's own model.
+
+**Signals:**
+- A class from `com.company.orders` used directly as a parameter or return type in `com.company.billing`
+- Response object from one service returned as-is from another service's method
+- Shared "common" model used across multiple bounded contexts with no explicit mapping
+
+```
+Examples:
+  // In BillingService:
+  fun charge(order: orders.Order): Receipt  ← orders.Order crosses into billing → violation
+  // Fix: map to billing.PaymentRequest first
+```
+
+### Pattern 9 — Business rule duplicated across the codebase
+The same business rule expressed in multiple places. When the rule changes, all copies must be updated — and they won't be.
+
+**Signals:**
+- Identical or near-identical conditionals in more than one service (e.g. `if (user.tier == PREMIUM)`)
+- The same validation logic in both the API layer and the domain layer with no shared source
+- Status transition rules repeated in multiple methods instead of centralized in one place
+
+```
+Examples:
+  // In OrderController:
+  if (order.status != PENDING) throw InvalidStateException()
+  // Also in OrderService:
+  if (order.status != PENDING) throw InvalidStateException()   ← duplicated rule → violation
+  // Fix: one method `order.requirePending()` or a state machine
+```
+
 ---
 
 ## Step 3: Verify each candidate violation in context (mandatory)
