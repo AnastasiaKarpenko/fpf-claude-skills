@@ -5,7 +5,7 @@ Two Claude Code skills for catching design problems — before you write code an
 | Skill | When to use | What you get |
 |-------|-------------|-------------|
 | `/fpf-design` | You have a problem or a design idea and want to think it through before coding | Structured breakdown: what acts, what's passive, where boundaries are, what's a guess vs what's decided |
-| `/fpf-review` | You have a diff or a file and want to check the structure of the implementation | PR-style report: what's clean, what's tangled, concrete fix suggestions |
+| `/fpf-review` | You're doing a code review and want to catch design and responsibility problems the linter won't find | PR-style report: what's clean, what's tangled, concrete fix suggestions |
 
 **The short version:** `/fpf-design` is for thinking. `/fpf-review` is for reviewing.
 
