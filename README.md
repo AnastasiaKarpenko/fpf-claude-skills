@@ -169,7 +169,9 @@ Core ideas behind the checks:
 
 ## Attribution
 
-These skills are built on top of FPF. If you use them, please cite:
+Skills authored by [Anastasia Karpenko](https://github.com/AnastasiaKarpenko). Built on top of FPF by Anatoly Levenchuk.
+
+If you find these skills useful, a link back to this repo is appreciated.
 
 > Levenchuk, Anatoly. First Principles Framework (FPF). GitHub repository: https://github.com/ailev/FPF
 
