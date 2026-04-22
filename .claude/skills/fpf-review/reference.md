@@ -1,7 +1,7 @@
 # FPF Reference — Solution Design
 
 > Distilled from [ailev/FPF](https://github.com/ailev/FPF) for use in solution design.
-> Covers: A.1, A.1.1, A.2, A.3, A.7, A.15, B.5
+> Covers: A.1, A.1.1, A.2, A.3, A.7, A.15
 
 ---
 
@@ -49,6 +49,8 @@ A `U.BoundedContext` is an explicit semantic frame: a named scope where terms, r
 | Same term across contexts assumed equal | Publish explicit Bridge with loss/fit note |
 | "Sub-contexts" with inheritance | Remove; express via Bridges only |
 | "Design context" vs "Runtime context" as separate contexts | Use DesignRunTag on artifacts; keep semantic frame fixed |
+
+**In code:** Accessing another context's internals without a Bridge = boundary violation. A module boundary in code maps directly to a Bounded Context boundary — crossing it without an explicit interface is an implicit cross-context dependency.
 
 ---
 
@@ -159,26 +161,7 @@ Before naming things, map common words to FPF terms:
 
 ---
 
-## 6. Reasoning Cycle (B.5) — Propose → Analyze → Test
-
-FPF's problem-solving engine. Three phases:
-
-| Phase | Question | What happens | FPF artifact state |
-|-------|---------|-------------|-------------------|
-| **Abduction** | "What is the most plausible explanation?" | Creative leap; propose hypothesis | L0 (unsubstantiated) |
-| **Deduction** | "If true, what follows logically?" | Derive consequences; check contradictions | L0 → L1 |
-| **Induction** | "Do predictions match reality?" | Test against evidence; corroborate or refute | L1 → L2+ |
-
-Maps to lifecycle: **Explore → Shape → Evidence → Operate**
-
-**Anti-patterns:**
-- Jumping to testing without a hypothesis (blind empiricism)
-- Treating data correlation as explanation (data dredging)
-- Building without stating what problem is solved (solution in search of a problem)
-
----
-
-## 7. Key Failure Modes (for validate mode)
+## 6. Key Failure Modes
 
 | Failure | Symptom | FPF rule violated |
 |---------|---------|------------------|
